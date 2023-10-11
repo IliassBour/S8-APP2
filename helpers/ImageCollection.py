@@ -160,3 +160,10 @@ class ImageCollection:
 
             # 2e histogramme
             # TODO L1.E4 afficher les autres histogrammes de Lab ou HSV dans la 2e colonne de subplots
+            ax[image_counter, 1].scatter(range(start, end), histtvaluesLab[0, start:end], s=3, c='yellow')
+            ax[image_counter, 1].scatter(range(start, end), histtvaluesLab[1, start:end], s=3, c='orange')
+            ax[image_counter, 1].scatter(range(start, end), histtvaluesLab[2, start:end], s=3, c='cyan')
+            ax[image_counter, 1].set(xlabel='intensité', ylabel='comptes')
+            # ajouter le titre de la photo observée dans le titre de l'histogramme
+            image_name = self.image_list[indexes[image_counter]]
+            ax[image_counter, 1].set_title(f'histogramme LAB de {image_name}')

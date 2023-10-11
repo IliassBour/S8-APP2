@@ -30,6 +30,7 @@ Fonctions :
 """
 
 import numpy as np
+from numpy import linalg as LA
 import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
 from matplotlib import cm
@@ -106,9 +107,9 @@ def calcModeleGaussien(data, message=''):
     :return: la moyenne, la matrice de covariance, les valeurs propres et les vecteurs propres de "data"
     """
     # TODO Labo L1.E2.2 Compléter le code avec les fonctions appropriées ici
-    moyenne = np.ones(np.asarray(data).shape[-1]) # pas_la_bonne_moyenne
-    matr_cov = np.identity(np.asarray(data).shape[-1]) # pas la bonne covariance
-    val_propres, vect_propres = [[1, 2], [[1,1],[-1, -1]]] # pas la bonne affaire
+    moyenne = np.mean(data, axis=0)  # pas_la_bonne_moyenne
+    matr_cov = np.cov(data, rowvar=False)  # pas la bonne covariance
+    val_propres, vect_propres = LA.eig(matr_cov)  # pas la bonne affaire
     if message:
         printModeleGaussien(moyenne, matr_cov, val_propres, vect_propres, message)
     return moyenne, matr_cov, val_propres, vect_propres
@@ -246,7 +247,7 @@ def project_onto_new_basis(data, basis):
     for i in range(dims[0]):  # dims[0] = n_classes
         tempdata = data[i]
         # TODO Labo L1.E2.5 Remplacer l'opération bidon par la bonne projection ici
-        # projected[i] = ??
+        projected[i] = np.matmul(tempdata, basis)
     return projected
 
 
