@@ -71,6 +71,8 @@ def main():
     # TODO L2.E3.1 Observez si différentes combinaisons de dimensions sont discriminantes
     data3D = data[:, 1:4]
     an.view3D(data3D, target_decode, 'dims 1 2 3')
+    data3D = data[:, 0:3]
+    an.view3D(data3D, target_decode, 'dims 0 1 2')
 
     # TODO Problématique Ici on prend un raccourci avec PCA, mais dans la problématique on demande d'utiliser
     # les techniques vues au labo1
@@ -104,16 +106,15 @@ def main():
     data, minmax = an.scaleData(data)
 
     # TODO L2.E3.4
-    training_data = data
-    validation_data = []
-    training_target = target
-    validation_target = []
+    # non optimale
+    training_data, validation_data, training_target, validation_target = ttsplit(data, target, train_size=0.8)
 
     # Create neural network
     # TODO L2.E3.3  Tune the number and size of hidden layers
     model = Sequential()
-    model.add(Dense(units=3, activation='linear',
-                    input_shape=(data.shape[-1],)))
+    model.add(Dense(units=6, activation='sigmoid', input_shape=(data.shape[-1],)))
+    model.add(Dense(units=8, activation='sigmoid'))
+    model.add(Dense(units=8, activation='sigmoid'))
     model.add(Dense(units=target.shape[-1], activation='linear'))
     print(model.summary())
 

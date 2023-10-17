@@ -118,7 +118,7 @@ class ImageCollection:
             indexes = [indexes]
 
         fig = plt.figure()
-        ax = fig.subplots(len(indexes), 2)
+        ax = fig.subplots(len(indexes), 3)
 
         for image_counter in range(len(indexes)):
             # charge une image si nécessaire
@@ -167,3 +167,11 @@ class ImageCollection:
             # ajouter le titre de la photo observée dans le titre de l'histogramme
             image_name = self.image_list[indexes[image_counter]]
             ax[image_counter, 1].set_title(f'histogramme LAB de {image_name}')
+
+            ax[image_counter, 2].scatter(range(start, end), histtvaluesLab[0, start:end], s=3, c='blue')
+            ax[image_counter, 2].scatter(range(start, end), histtvaluesLab[1, start:end], s=3, c='green')
+            ax[image_counter, 2].scatter(range(start, end), histtvaluesLab[2, start:end], s=3, c='magenta')
+            ax[image_counter, 2].set(xlabel='intensité', ylabel='comptes')
+            # ajouter le titre de la photo observée dans le titre de l'histogramme
+            image_name = self.image_list[indexes[image_counter]]
+            ax[image_counter, 2].set_title(f'histogramme HSV de {image_name}')

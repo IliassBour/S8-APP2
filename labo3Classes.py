@@ -19,7 +19,7 @@ import keras as K
 def labo_APP2():
     data3classes = ClassificationData()
     # Changer le flag dans les sections pertinentes pour chaque partie de laboratoire
-    if True:
+    if False:
         # TODO Labo L1.E1.3 et L3.E1
         print('\n\n=========================\nDonnées originales\n')
         # Affiche les stats de base
@@ -29,7 +29,7 @@ def labo_APP2():
         # exemple d'une densité de probabilité arbitraire pour 1 classe
         an.creer_hist2D(data3classes.dataLists[0], 'C1', view=True)
 
-    if True:
+    if False:
         # Décorrélation
         # TODO Labo L1.E3.5
         # data3classesDecorr = ClassificationData(il_manque_la_decorréleation_ici)
@@ -40,15 +40,23 @@ def labo_APP2():
 
     if False: # TODO Labo L2.E4
         # Exemple de RN
-        n_neurons = 2
-        n_layers = 1
-        nn1 = classifiers.NNClassify_APP2(data2train=data3classes, data2test=data3classes,
+        n_neurons = 8
+        n_layers = 3
+
+        data3classesDecorr = ClassificationData(
+            an.project_onto_new_basis(data3classes.dataLists, data3classes.vectpr[0]))
+        print('\n\n=========================\nDonnées décorrélées\n')
+        data3classesDecorr.getStats(gen_print=True)
+        data3classesDecorr.getBorders(view=True)
+
+        nn1 = classifiers.NNClassify_APP2(data2train=data3classesDecorr, data2test=data3classes,
                                           n_layers=n_layers, n_neurons=n_neurons, innerActivation='tanh',
-                                          outputActivation='softmax', optimizer=Adam(), loss='binary_crossentropy',
+                                          outputActivation='softmax', optimizer=Adam(), loss='categorical_crossentropy',
                                           metrics=['accuracy'],
-                                          callback_list=[],     # TODO à compléter L2.E4
+                                          callback_list=[K.callbacks.EarlyStopping(patience=50, verbose=1, restore_best_weights=1),
+                                                         classifiers.print_every_N_epochs(25)],     # TODO à compléter L2.E4
                                           experiment_title='NN Simple',
-                                          n_epochs = 10, savename='3classes',
+                                          n_epochs = 1000, savename='3classes',
                                           ndonnees_random=5000, gen_output=True, view=True)
 
     if False:  # TODO L3.E2
@@ -61,10 +69,10 @@ def labo_APP2():
         # suivi d'un 1-PPV avec ces nouveaux représentants de classes
         ppv1km1 = classifiers.PPVClassify_APP2(data2train=data3classes, data2test=data3classes, n_neighbors=1,
                                                experiment_title='1-PPV sur le 1-moy',
-                                               useKmean=True, n_representants=1,
+                                               useKmean=True, n_representants=7,
                                                gen_output=True, view=True)
 
-    if False:  # TODO L3.E3
+    if True:  # TODO L3.E3
         # Exemple de classification bayésienne
         apriori = [1/3, 1/3, 1/3]
         cost = [[0, 1, 1], [1, 0, 1], [1, 1, 0]]

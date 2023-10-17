@@ -90,14 +90,14 @@ def main():
     # TODO Comparez la performance de l'apprentissage avec un nombre différents de couches et de neurones
     # de fonctions d'activations, etc.
     model = Sequential()
-    # model.add(Dense(units=1, activation='linear', input_shape=(2,)))
-    model.add(Dense(units=1, activation='sigmoid', input_shape=(2,)))
-    model.add(Dense(units=1, activation='linear'))
+    #model.add(Dense(units=3, activation='sigmoid', input_shape=(2,)))
+    model.add(Dense(units=4, activation='sigmoid', input_shape=(2,)))
+    model.add(Dense(units=1, activation='sigmoid'))
     print(model.summary())
 
     # Define training parameters
     # TODO Comparez la performance de l'apprentissage avec une autre loss, learning rate, etc. :-)
-    model.compile(optimizer=SGD(learning_rate=0.5, momentum=0.9), loss='mse')
+    model.compile(optimizer=SGD(learning_rate=0.5, momentum=0.9), loss='binary_crossentropy')
 
     # Perform training
     model.fit(data, target, batch_size=len(data), epochs=1000, shuffle=True, verbose=1)
@@ -121,5 +121,5 @@ def main():
 
 if __name__ == "__main__":
     # Décommenter ceci pour rendre le code déterministe et pouvoir déverminer
-    # setReproducible()
+    setReproducible()
     main()
