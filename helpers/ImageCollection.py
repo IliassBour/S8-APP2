@@ -23,6 +23,7 @@ from enum import IntEnum, auto
 
 from skimage import color as skic
 from skimage import io as skiio
+from scipy import ndimage
 
 import helpers.analysis as an
 
@@ -64,6 +65,24 @@ class ImageCollection:
                 self.labels.append(ImageCollection.imageLabels.street)
             else:
                 raise ValueError(i)
+
+    def getRGBVariance(self, image):
+        # from https://www.odelama.com/data-analysis/How-to-Compute-RGB-Image-Standard-Deviation-from-Channels-Statistics/
+        red = image[..., 0]
+        green = image[..., 1]
+        blue = image[..., 2]
+        avgR = np.sum(red) / (256*256)
+        avgG = np.sum(green) / (256 * 256)
+        avgB = np.sum(blue) / (256 * 256)
+        varR = np.var(red)
+        varG = np.var(green)
+        varB = np.var(blue)
+
+        varRGB = 0.333 * (varR + varG + varB +
+                          np.square(avgR) + np.square(avgG) + np.square(avgB) -
+                          avgR * avgG - avgR * avgB - avgG * avgB)
+
+        return varRGB
 
     def get_samples(self, N):
         return np.sort(random.sample(range(np.size(self.image_list, 0)), N))
@@ -118,7 +137,7 @@ class ImageCollection:
             indexes = [indexes]
 
         fig = plt.figure()
-        ax = fig.subplots(len(indexes), 2)
+        ax = fig.subplots(len(indexes), 3)
 
         for image_counter in range(len(indexes)):
             # charge une image si nécessaire
@@ -131,7 +150,7 @@ class ImageCollection:
             # Exemple de conversion de format pour Lab et HSV
             imageLab = skic.rgb2lab(imageRGB)  # TODO L1.E4.5: afficher ces nouveaux histogrammes
             imageHSV = skic.rgb2hsv(imageRGB)  # TODO problématique: essayer d'autres espaces de couleur
-
+            print("math variance: ", self.getRGBVarianceLuma(imageRGB))
             # Number of bins per color channel pour les histogrammes (et donc la quantification de niveau autres formats)
             n_bins = 256
 
@@ -160,10 +179,18 @@ class ImageCollection:
 
             # 2e histogramme
             # TODO L1.E4 afficher les autres histogrammes de Lab ou HSV dans la 2e colonne de subplots
-            ax[image_counter, 1].scatter(range(start, end), histtvaluesLab[0, start:end], s=3, c='yellow')
-            ax[image_counter, 1].scatter(range(start, end), histtvaluesLab[1, start:end], s=3, c='orange')
+            ax[image_counter, 1].scatter(range(start, end), histtvaluesLab[0, start:end], s=3, c='magenta')
+            ax[image_counter, 1].scatter(range(start, end), histtvaluesLab[1, start:end], s=3, c='purple')
             ax[image_counter, 1].scatter(range(start, end), histtvaluesLab[2, start:end], s=3, c='cyan')
             ax[image_counter, 1].set(xlabel='intensité', ylabel='comptes')
             # ajouter le titre de la photo observée dans le titre de l'histogramme
             image_name = self.image_list[indexes[image_counter]]
             ax[image_counter, 1].set_title(f'histogramme LAB de {image_name}')
+
+            ax[image_counter, 2].scatter(range(start, end), histvaluesHSV[0, start:end], s=3, c='brown')
+            ax[image_counter, 2].scatter(range(start, end), histvaluesHSV[1, start:end], s=3, c='blue')
+            ax[image_counter, 2].scatter(range(start, end), histvaluesHSV[2, start:end], s=3, c='red')
+            ax[image_counter, 2].set(xlabel='intensité', ylabel='comptes')
+            # ajouter le titre de la photo observée dans le titre de l'histogramme
+            image_name = self.image_list[indexes[image_counter]]
+            ax[image_counter, 2].set_title(f'histogramme HSV de {image_name}')
