@@ -107,9 +107,9 @@ def calcModeleGaussien(data, message=''):
     :return: la moyenne, la matrice de covariance, les valeurs propres et les vecteurs propres de "data"
     """
     # TODO Labo L1.E2.2 Compléter le code avec les fonctions appropriées ici
-    moyenne = np.mean(data, axis=0)  # pas_la_bonne_moyenne
-    matr_cov = np.cov(data, rowvar=False)  # pas la bonne covariance
-    val_propres, vect_propres = LA.eig(matr_cov)  # pas la bonne affaire
+    moyenne = np.mean(data, axis=0)
+    matr_cov = np.cov(data, rowvar=False)
+    val_propres, vect_propres = LA.eig(matr_cov)
     if message:
         printModeleGaussien(moyenne, matr_cov, val_propres, vect_propres, message)
     return moyenne, matr_cov, val_propres, vect_propres
@@ -499,8 +499,8 @@ def viewEllipse(data, ax, scale=1, facecolor='none', edgecolor='red', **kwargs):
     moy, cov, lambdas, vectors = calcModeleGaussien(data)
     # TODO L3.E1.1 Remplacer les valeurs bidons par les bons paramètres à partir des stats ici
     # tous les 1 sont suspects
-    ellipse = Ellipse((1, 1), width=2 * np.sqrt(1) * scale, height=2 * np.sqrt(1) * scale,
-                      angle=-np.degrees(1), facecolor=facecolor,
+    ellipse = Ellipse((moy[0], moy[1]), width=np.sqrt(lambdas[1]) * scale, height=np.sqrt(lambdas[0]) * scale,
+                      angle=np.arctan2(vectors[0][0], vectors[0][1])*180/np.pi, facecolor=facecolor,
                       edgecolor=edgecolor, linewidth=2, **kwargs)
     return ax.add_patch(ellipse)
 

@@ -160,11 +160,17 @@ class BayesClassifier:
         classProbDensities = []
         # calcule la valeur de la probabilité d'appartenance à chaque classe pour les données à tester
         for i in range(self.n_classes):  # itère sur toutes les classes
-            classProbDensities.append(self.densities[i].computeProbability(testdata1array))
+            classProbDensities.append(self.densities[i].computeProbability(testdata1array) * self.apriori[i])
         # reshape pour que les lignes soient les calculs pour 1 point original, i.e. même disposition que l'array d'entrée
         classProbDensities = np.array(classProbDensities).T
+        risques = []
+        for row in classProbDensities:
+            R1 = row[1] * self.costs[0][1] + row[2] * self.costs[0][2]
+            R2 = row[0] * self.costs[1][0] + row[2] * self.costs[1][2]
+            R3 = row[0] * self.costs[2][0] + row[1] * self.costs[2][1]
+            risques.append([R1,R2,R3])
         # TODO problematique: take apriori and cost into consideration! here for risk computation argmax assumes equal costs and apriori
-        predictions = np.argmax(classProbDensities, axis=1).reshape(testDataNSamples, 1)
+        predictions = np.argmin(risques, axis=1).reshape(testDataNSamples, 1)
         if np.asarray(expected_labels1array).any():
             errors_indexes = an.calc_erreur_classification(expected_labels1array, predictions, gen_output)
         else:
@@ -207,7 +213,7 @@ class PPVClassifier:
         # TODO L2.E3.1 Compléter la logique pour utiliser la librairie ici
         # le 1 est suspect et il manque des arguments
         self.n_classes, _, self.representationDimensions = np.asarray(data2train.dataLists).shape
-        self.kNN = KNN(1)  # minkowski correspond à distance euclidienne lorsque le paramètre p = 2
+        self.kNN = KNN(n_neighbors=n_neighbors)  # minkowski correspond à distance euclidienne lorsque le paramètre p = 2
         # Exécute un clustering pour calculer les représentants de classe si demandés
         if useKmean:
             assert n_represantants >= n_neighbors
@@ -279,7 +285,7 @@ class KMeanAlgo:
         for i in range(self.n_classes):  # itère sur l'ensemble des classes
             # TODO L2.E3.3 compléter la logique pour utiliser la librairie ici
             # encore une fois le 1 est suspect
-            self.kmeans_on_each_class.append(KM(1, n_init='auto'))
+            self.kmeans_on_each_class.append(KM(n_representants, n_init='auto'))
             self.kmeans_on_each_class[i].fit(np.array(data2train.dataLists[i]))
             self.cluster_centers.append(self.kmeans_on_each_class[i].cluster_centers_)
             self.cluster_labels[range(n_representants * i, n_representants * (i + 1))] = \
