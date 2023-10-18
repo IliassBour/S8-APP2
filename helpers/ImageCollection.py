@@ -23,6 +23,7 @@ from enum import IntEnum, auto
 
 from skimage import color as skic
 from skimage import io as skiio
+from skimage.restoration import estimate_sigma
 from scipy import ndimage
 
 import helpers.analysis as an
@@ -91,8 +92,9 @@ class ImageCollection:
         lum = histtvaluesLab[1]
         return lum[np.argmax(lum)]
 
-    def other_param(self, data):
-        return None
+    def calculate_noise(self, data):
+        img = skic.rgb2gray(data)
+        return estimate_sigma(img, average_sigmas=True)
 
     def last_param(self, data):
         return None
@@ -165,6 +167,7 @@ class ImageCollection:
             imageHSV = skic.rgb2hsv(imageRGB)  # TODO problématique: essayer d'autres espaces de couleur
             print("math variance: ", self.getRGBVariance(imageRGB))
             print("max luminence: ", self.max_luminence(imageRGB))
+            print("noise: ", self.calculate_noise(imageRGB))
             # Number of bins per color channel pour les histogrammes (et donc la quantification de niveau autres formats)
             n_bins = 256
 
