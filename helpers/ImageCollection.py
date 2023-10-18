@@ -81,8 +81,21 @@ class ImageCollection:
         varRGB = 0.333 * (varR + varG + varB +
                           np.square(avgR) + np.square(avgG) + np.square(avgB) -
                           avgR * avgG - avgR * avgB - avgG * avgB)
-
         return varRGB
+
+    def max_luminence(self, data):
+        n_bins = 256
+        imageLab = skic.rgb2lab(data)
+        imageLabhist = an.rescaleHistLab(imageLab, n_bins)
+        histtvaluesLab = self.generateHistogram(imageLabhist)
+        lum = histtvaluesLab[1]
+        return lum[np.argmax(lum)]
+
+    def other_param(self, data):
+        return None
+
+    def last_param(self, data):
+        return None
 
     def get_samples(self, N):
         return np.sort(random.sample(range(np.size(self.image_list, 0)), N))
@@ -150,7 +163,8 @@ class ImageCollection:
             # Exemple de conversion de format pour Lab et HSV
             imageLab = skic.rgb2lab(imageRGB)  # TODO L1.E4.5: afficher ces nouveaux histogrammes
             imageHSV = skic.rgb2hsv(imageRGB)  # TODO problématique: essayer d'autres espaces de couleur
-            print("math variance: ", self.getRGBVarianceLuma(imageRGB))
+            print("math variance: ", self.getRGBVariance(imageRGB))
+            print("max luminence: ", self.max_luminence(imageRGB))
             # Number of bins per color channel pour les histogrammes (et donc la quantification de niveau autres formats)
             n_bins = 256
 
@@ -158,10 +172,12 @@ class ImageCollection:
             imageLabhist = an.rescaleHistLab(imageLab, n_bins) # External rescale pour Lab
             imageHSVhist = np.round(imageHSV * (n_bins - 1))  # HSV has all values between 0 and 100
 
+
             # Construction des histogrammes
             histvaluesRGB = self.generateHistogram(imageRGB)
             histtvaluesLab = self.generateHistogram(imageLabhist)
             histvaluesHSV = self.generateHistogram(imageHSVhist)
+
 
             # permet d'omettre les bins très sombres et très saturées aux bouts des histogrammes
             skip = 5
