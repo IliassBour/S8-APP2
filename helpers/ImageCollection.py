@@ -23,7 +23,7 @@ from enum import IntEnum, auto
 
 from skimage import color as skic
 from skimage import io as skiio
-from skimage.restoration import estimate_sigma
+from skimage import restoration as skir
 from scipy import ndimage
 
 import helpers.analysis as an
@@ -67,6 +67,46 @@ class ImageCollection:
             else:
                 raise ValueError(i)
 
+    def prep_images(self):
+        coast = []
+        forest = []
+        street = []
+        for image_counter in range(len(self.image_list)):
+            # charge une image si nécessaire
+            if self.all_images_loaded:
+                imageRGB = self.images[image_counter]
+            else:
+                imageRGB = skiio.imread(
+                    self.image_folder + os.sep + self.image_list[image_counter])
+
+            #rgb_variance = self.getRGBVariance(imageRGB)
+            lightness_max = self.max_luminence(imageRGB)
+            rgb_stand_er = self.standard_error_RGB(imageRGB)
+            xyz_stand_er = self.standard_error_XYZ(imageRGB)
+            noise = self.calculate_noise(imageRGB)
+
+            data = np.array([noise, xyz_stand_er, rgb_stand_er, lightness_max])
+            img_class = self.labels[image_counter]
+            if img_class == 1:
+                coast.append(data)
+            elif img_class == 2:
+                forest.append(data)
+            elif img_class == 3:
+                street.append(data)
+
+        dataList = []
+        npcoast = np.array(coast)
+        npforest = np.array(forest)
+        npstreet = np.array(street)
+
+        dataList.append(npcoast)
+        dataList.append(npforest)
+        dataList.append(npstreet)
+
+        dataList = np.array(dataList)
+
+        return dataList
+
     def getRGBVariance(self, image):
         # from https://www.odelama.com/data-analysis/How-to-Compute-RGB-Image-Standard-Deviation-from-Channels-Statistics/
         red = image[..., 0]
@@ -94,10 +134,14 @@ class ImageCollection:
 
     def calculate_noise(self, data):
         img = skic.rgb2gray(data)
-        return estimate_sigma(img, average_sigmas=True)
+        return skir.estimate_sigma(img, average_sigmas=True)
 
-    def last_param(self, data):
-        return None
+    def standard_error_RGB(self, data):
+        return np.around(np.std(data[2])/256, decimals=10)
+
+    def standard_error_XYZ(self, data):
+        img = skic.rgb2xyz(data)
+        return np.around(np.std(img[2])/256, decimals=10)
 
     def get_samples(self, N):
         return np.sort(random.sample(range(np.size(self.image_list, 0)), N))
@@ -165,9 +209,11 @@ class ImageCollection:
             # Exemple de conversion de format pour Lab et HSV
             imageLab = skic.rgb2lab(imageRGB)  # TODO L1.E4.5: afficher ces nouveaux histogrammes
             imageHSV = skic.rgb2hsv(imageRGB)  # TODO problématique: essayer d'autres espaces de couleur
-            print("math variance: ", self.getRGBVariance(imageRGB))
-            print("max luminence: ", self.max_luminence(imageRGB))
+            imageXYZ = skic.rgb2xyz(imageRGB)
+            #print("math variance: ", self.getRGBVariance(imageRGB))
+            #print("max luminence: ", self.max_luminence(imageRGB))
             print("noise: ", self.calculate_noise(imageRGB))
+            print("standard error: ", self.standard_error(imageXYZ))
             # Number of bins per color channel pour les histogrammes (et donc la quantification de niveau autres formats)
             n_bins = 256
 
