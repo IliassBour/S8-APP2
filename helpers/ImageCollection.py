@@ -79,13 +79,13 @@ class ImageCollection:
                 imageRGB = skiio.imread(
                     self.image_folder + os.sep + self.image_list[image_counter])
 
-            #rgb_variance = self.getRGBVariance(imageRGB)
-            lightness_max = self.max_luminence(imageRGB)
-            rgb_stand_er = self.standard_error_RGB(imageRGB)
-            xyz_stand_er = self.standard_error_XYZ(imageRGB)
-            noise = self.calculate_noise(imageRGB)
+            #rgb_variance = self.getRGBVariance(imageRGB)/10
+            lightness_max = self.max_luminence(imageRGB)/10
+            #rgb_stand_er = self.standard_error_RGB(imageRGB)*3000
+            xyz_stand_er = self.standard_error_XYZ(imageRGB)*1000000
+            #noise = self.calculate_noise(imageRGB)*10000
 
-            data = np.array([noise, xyz_stand_er, rgb_stand_er, lightness_max])
+            data = np.array([lightness_max, xyz_stand_er])
             img_class = self.labels[image_counter]
             if img_class == 1:
                 coast.append(data)
@@ -99,11 +99,10 @@ class ImageCollection:
         npforest = np.array(forest)
         npstreet = np.array(street)
 
-        dataList.append(npcoast)
-        dataList.append(npforest)
-        dataList.append(npstreet)
+        dataList.append(npcoast[:200])
+        dataList.append(npforest[:200])
+        dataList.append(npstreet[:200])
 
-        dataList = np.array(dataList)
 
         return dataList
 
@@ -124,6 +123,9 @@ class ImageCollection:
                           avgR * avgG - avgR * avgB - avgG * avgB)
         return varRGB
 
+    def standard_err_gray(self, data):
+        img = skic.rgb2gray(data)
+        return np.around(np.std(img) / 256, decimals=10)
     def max_luminence(self, data):
         n_bins = 256
         imageLab = skic.rgb2lab(data)
@@ -141,7 +143,7 @@ class ImageCollection:
 
     def standard_error_XYZ(self, data):
         img = skic.rgb2xyz(data)
-        return np.around(np.std(img[2])/256, decimals=10)
+        return np.around(np.std(img[1])/256, decimals=10)
 
     def get_samples(self, N):
         return np.sort(random.sample(range(np.size(self.image_list, 0)), N))
@@ -210,10 +212,11 @@ class ImageCollection:
             imageLab = skic.rgb2lab(imageRGB)  # TODO L1.E4.5: afficher ces nouveaux histogrammes
             imageHSV = skic.rgb2hsv(imageRGB)  # TODO problématique: essayer d'autres espaces de couleur
             imageXYZ = skic.rgb2xyz(imageRGB)
-            #print("math variance: ", self.getRGBVariance(imageRGB))
+            print("math variance: ", self.getRGBVariance(imageRGB))
             #print("max luminence: ", self.max_luminence(imageRGB))
             print("noise: ", self.calculate_noise(imageRGB))
-            print("standard error: ", self.standard_error(imageXYZ))
+            print("standard error XYZ: ", self.standard_error_RGB(imageXYZ))
+            print("standard error RGB: ", self.standard_error_RGB(imageRGB))
             # Number of bins per color channel pour les histogrammes (et donc la quantification de niveau autres formats)
             n_bins = 256
 

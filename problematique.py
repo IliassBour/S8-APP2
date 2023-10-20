@@ -5,6 +5,7 @@ Problématique APP2 Module IA S8
 
 import matplotlib.pyplot as plt
 
+from helpers.ClassificationData import ClassificationData
 from helpers.ImageCollection import ImageCollection
 
 
@@ -17,9 +18,13 @@ def problematique_APP2():
         # TODO L1.E4.3 à L1.E4.5
         # Analyser quelques images pour développer des pistes pour le choix de la représentation
         points = images.prep_images()
-        N = 6
-        im_list = images.get_samples(N)
-        print(im_list)
+        data = ClassificationData(points)
+        data.getStats(gen_print=True)
+        # Figure avec les ellipses et les frontières
+        data.getBorders(view=True)
+        #N = 6
+        #im_list = images.get_samples(N)
+        #print(im_list)
         #images.images_display(im_list)
         #images.view_histogrammes(im_list)
 
