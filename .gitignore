@@ -1,2 +1,4 @@
 /saves/3classes.pkl
 /saves/3classes.keras
+/.idea/*
+/helpers/__pycache__/*
