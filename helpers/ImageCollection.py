@@ -81,11 +81,11 @@ class ImageCollection:
 
             #rgb_variance = self.getRGBVariance(imageRGB)/10
             lightness_max = self.max_luminence(imageRGB)/10
-            #rgb_stand_er = self.standard_error_RGB(imageRGB)*3000
+            rgb_stand_er = self.standard_error_RGB(imageRGB)*3000
             xyz_stand_er = self.standard_error_XYZ(imageRGB)*1000000
-            #noise = self.calculate_noise(imageRGB)*10000
+            noise = self.calculate_noise(imageRGB)*10000
 
-            data = np.array([lightness_max, xyz_stand_er])
+            data = np.array([xyz_stand_er, noise, lightness_max, rgb_stand_er])
             img_class = self.labels[image_counter]
             if img_class == 1:
                 coast.append(data)
@@ -99,9 +99,9 @@ class ImageCollection:
         npforest = np.array(forest)
         npstreet = np.array(street)
 
-        dataList.append(npcoast[:200])
-        dataList.append(npforest[:200])
-        dataList.append(npstreet[:200])
+        dataList.append(npcoast[:250])
+        dataList.append(npforest[:250])
+        dataList.append(npstreet[:250])
 
 
         return dataList
