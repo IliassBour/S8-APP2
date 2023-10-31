@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 from helpers.ClassificationData import ClassificationData
 from helpers.ImageCollection import ImageCollection
-
+import helpers.classifiers as classifiers
 
 #######################################
 def problematique_APP2():
@@ -22,6 +22,13 @@ def problematique_APP2():
         data.getStats(gen_print=True)
         # Figure avec les ellipses et les frontières
         data.getBorders(view=True)
+
+        ppv = classifiers.PPVClassify_APP2(data2train=data, data2test=data, n_neighbors=3, ndonnees_random=5000,
+                                           useKmean=False, n_representants=5, experiment_title='K-ppv',
+                                           gen_output=True, view=True) # erreur 10.6668% sans cluster, erreur 27.733% avec cluster
+
+
+        #ppv.predictTest
         #N = 6
         #im_list = images.get_samples(N)
         #print(im_list)
