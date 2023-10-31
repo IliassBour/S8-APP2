@@ -5,6 +5,10 @@ Problématique APP2 Module IA S8
 
 import matplotlib.pyplot as plt
 
+from sklearn.model_selection import train_test_split as ttsplit
+from keras.optimizers import Adam
+import keras as K
+
 from helpers.ClassificationData import ClassificationData
 from helpers.ImageCollection import ImageCollection
 import helpers.classifiers as classifiers
@@ -20,15 +24,23 @@ def problematique_APP2():
         points = images.prep_images()
         data = ClassificationData(points)
         data.getStats(gen_print=True)
-        # Figure avec les ellipses et les frontières
-        data.getBorders(view=True)
+
+        n_neurons = 8
+        n_layers = 7
+
+        nn = classifiers.NNClassify_APP2(data2train=data, data2test=data,
+                                          n_layers=n_layers, n_neurons=n_neurons, innerActivation='tanh',
+                                          outputActivation='softmax', optimizer=Adam(), loss='categorical_crossentropy',
+                                          metrics=['accuracy'],
+                                          callback_list=[K.callbacks.EarlyStopping(patience=50, verbose=1, restore_best_weights=1),
+                                                         classifiers.print_every_N_epochs(25)],
+                                          experiment_title='NN Simple',
+                                          n_epochs = 1000, savename='classification',
+                                          ndonnees_random=5000, gen_output=True, view=True)
 
         ppv = classifiers.PPVClassify_APP2(data2train=data, data2test=data, n_neighbors=3, ndonnees_random=5000,
                                            useKmean=False, n_representants=5, experiment_title='K-ppv',
                                            gen_output=True, view=True) # erreur 10.6668% sans cluster, erreur 27.733% avec cluster
-
-
-        #ppv.predictTest
         #N = 6
         #im_list = images.get_samples(N)
         #print(im_list)
