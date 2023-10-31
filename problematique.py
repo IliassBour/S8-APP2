@@ -5,13 +5,12 @@ Problématique APP2 Module IA S8
 
 import matplotlib.pyplot as plt
 
+import helpers.classifiers as classifiers
 from sklearn.model_selection import train_test_split as ttsplit
-from keras.optimizers import Adam
-import keras as K
-
 from helpers.ClassificationData import ClassificationData
 from helpers.ImageCollection import ImageCollection
-import helpers.classifiers as classifiers
+from keras.optimizers import Adam
+import keras as K
 
 #######################################
 def problematique_APP2():
@@ -41,6 +40,12 @@ def problematique_APP2():
         ppv = classifiers.PPVClassify_APP2(data2train=data, data2test=data, n_neighbors=3, ndonnees_random=5000,
                                            useKmean=False, n_representants=5, experiment_title='K-ppv',
                                            gen_output=True, view=True) # erreur 10.6668% sans cluster, erreur 27.733% avec cluster
+            apriori = [1 / 3, 1 / 3, 1 / 3]
+            cost = [[0, 1, 1], [1, 0, 1], [1, 1, 0]]
+            bg1 = classifiers.BayesClassify_APP2(data2train=data, data2test=data,
+                                                 apriori=apriori, costs=cost,
+                                                 experiment_title='probabilités gaussiennes',
+                                                 gen_output=True, view=True)
         #N = 6
         #im_list = images.get_samples(N)
         #print(im_list)

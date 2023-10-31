@@ -79,11 +79,11 @@ class ImageCollection:
                 imageRGB = skiio.imread(
                     self.image_folder + os.sep + self.image_list[image_counter])
 
-            rgb_variance = self.getRGBVariance(imageRGB)/10
-            lightness_max = self.max_luminence(imageRGB)/10
-            rgb_stand_er = self.standard_error_RGB(imageRGB)*3000
-            xyz_stand_er = self.standard_error_XYZ(imageRGB)*1000000
-            noise = self.calculate_noise(imageRGB)*10000
+            # rgb_variance = self.getRGBVariance(imageRGB)/10
+            lightness_max = self.max_luminence(imageRGB) / 10
+            rgb_stand_er = self.standard_error_RGB(imageRGB) * 3000
+            xyz_stand_er = self.standard_error_XYZ(imageRGB) * 1000000
+            noise = self.calculate_noise(imageRGB) * 10000
 
             data = np.array([xyz_stand_er, noise, lightness_max, rgb_stand_er])
             img_class = self.labels[image_counter]
@@ -102,7 +102,6 @@ class ImageCollection:
         dataList.append(npcoast[:250])
         dataList.append(npforest[:250])
         dataList.append(npstreet[:250])
-
 
         return dataList
 

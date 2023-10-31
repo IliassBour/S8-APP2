@@ -103,19 +103,33 @@ class histProbDensity:
     Train intégré dans le constructeur
     Predict à part -> computeProbaility
     """
+
     def __init__(self, data2train, title='', view=False):
+        self.bins = 10
         _, self.representationDimensions = np.asarray(data2train).shape
-        self.extent = data2train.extent
-        # TODO problématique: modifier la modélisation pour fonctionner avec une dimensionalité plus élevée
-        self.hist, self.xedges, self.yedges = an.creer_hist2D(data2train, title=title, view=view)
+        # self.extent = data2train.extent
+        # self.hist, self.xedges, self.yedges = an.creer_hist2D(data2train, title=title, view=view)
+        self.hist, self.edges = np.histogramdd(data2train, bins=self.bins)
+        histsum = np.sum(self.hist)
+        self.hist = self.hist / histsum
 
     def computeProbability(self, testdata1array):
         testDataNSamples, testDataDimensions = np.asarray(testdata1array).shape
         assert testDataDimensions == self.representationDimensions
-        # TODO JB assert testdata within extent
-        # TODO laboratoire: compléter le pseudocode et implémenter un calcul de probabilité
-        raise NotImplementedError()
-        return  # something to be computed
+        probs = []
+        for point in testdata1array:
+            indices = []
+            for i in range(self.representationDimensions):
+                for j in range(len(self.edges[i]) - 1):
+                    if (point[i] >= self.edges[i][j] or j == 0) and (
+                            point[i] <= self.edges[i][j + 1] or j == self.bins - 1):
+                        indices.append(j)
+                        break
+            val = self.hist[tuple(indices)]
+            probs.append(val)
+
+        probs = np.array(probs)
+        return probs
 
 
 #############################################################################
@@ -126,7 +140,7 @@ class BayesClassifier:
     Train() est intégré dans le constructeur, i.e. le constructeur calcule les modèles directement
     Predict est incomplet (ne tient pas compte du coût et des a priori
     """
-    def __init__(self, data2trainLists, probabilitydensityType=GaussianProbDensity, apriori=None, costs=None):
+    def __init__(self, data2trainLists, probabilitydensityType=histProbDensity, apriori=None, costs=None):
         """
         data2trainLists: correspond au format de listes de ClassificationData()
         probailitydensityType: pointeur à une des fonctions de probabilité voir ci-dessus
@@ -160,17 +174,19 @@ class BayesClassifier:
         classProbDensities = []
         # calcule la valeur de la probabilité d'appartenance à chaque classe pour les données à tester
         for i in range(self.n_classes):  # itère sur toutes les classes
-            classProbDensities.append(self.densities[i].computeProbability(testdata1array) * self.apriori[i])
+            classProbDensities.append(self.densities[i].computeProbability(testdata1array))
         # reshape pour que les lignes soient les calculs pour 1 point original, i.e. même disposition que l'array d'entrée
         classProbDensities = np.array(classProbDensities).T
-        risques = []
-        for row in classProbDensities:
-            R1 = row[1] * self.costs[0][1] + row[2] * self.costs[0][2]
-            R2 = row[0] * self.costs[1][0] + row[2] * self.costs[1][2]
-            R3 = row[0] * self.costs[2][0] + row[1] * self.costs[2][1]
-            risques.append([R1,R2,R3])
         # TODO problematique: take apriori and cost into consideration! here for risk computation argmax assumes equal costs and apriori
-        predictions = np.argmin(risques, axis=1).reshape(testDataNSamples, 1)
+        for i in range(len(classProbDensities)):
+            densities = classProbDensities[i]
+            if densities[0] <= 0.001 and densities[1] <= 0.001 and densities[2] <= 0.001:
+                classProbDensities[i, 0] = 1
+        classProbDensities[:, 0] *= self.costs[0][1] * self.costs[0][2]
+        classProbDensities[:, 1] *= self.costs[1][0] * self.costs[1][2]
+        classProbDensities[:, 2] *= self.costs[2][0] * self.costs[2][1]
+
+        predictions = np.argmax(classProbDensities, axis=1).reshape(testDataNSamples, 1)
         if np.asarray(expected_labels1array).any():
             errors_indexes = an.calc_erreur_classification(expected_labels1array, predictions, gen_output)
         else:
@@ -180,7 +196,7 @@ class BayesClassifier:
 
 class BayesClassify_APP2:
     def __init__(self, data2train, data2test=None, ndonnees_random=5000,
-                 probabilitydensityType=GaussianProbDensity, apriori=None, costs=None,
+                 probabilitydensityType=histProbDensity, apriori=None, costs=None,
                  experiment_title='Bayes Classifier', gen_output=False, view=False):
         """
         Wrapper avec tous les nice to have pour un classificateur bayésien
@@ -205,7 +221,6 @@ class BayesClassify_APP2:
                                        title_test1=f'Données aléatoires classées',
                                        title_test2='Données d\'origine reclassées',
                                        extent=data2train.extent)
-
 
 class PPVClassifier:
     def __init__(self, data2train, n_neighbors=1, metric='minkowski',
