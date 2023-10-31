@@ -85,7 +85,7 @@ class ImageCollection:
             xyz_stand_er = self.standard_error_XYZ(imageRGB)*1000000
             noise = self.calculate_noise(imageRGB)*10000
 
-            data = np.array([noise, lightness_max, rgb_stand_er])
+            data = np.array([xyz_stand_er, noise, lightness_max, rgb_stand_er])
             img_class = self.labels[image_counter]
             if img_class == 1:
                 coast.append(data)
