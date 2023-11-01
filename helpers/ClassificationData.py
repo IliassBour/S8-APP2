@@ -8,7 +8,6 @@ Membres :
     les données sont représentées sous 2 formes
         i. Liste de listes ou array_like
             -> Format nécessaire quand on veut constuire l'objet à partir de données existantes.
-                TODO problématique: construire un object classification data à partir des quantités retenues pour la représentation
             -> dataLists : array_like de dimension K * L * M, K le nombre de classes distinctes, L les données pour chaque classe
             Note: il n'existe pas d'étiquette explicite pour ce format, on utilise automatiquement la position dans l'array selon la première dimension
         ii. 1 seul long vecteur. Généré automatiquement à partir du format précédent
@@ -31,7 +30,7 @@ class ClassificationData:
 
     def __init__(self, existingData=None):
         if np.asarray(existingData).any():
-            self.dataLists = existingData  # TODO JB assert  le format fourni
+            self.dataLists = existingData
         else:
             self.dataLists = []
             # Import data from text files in subdir

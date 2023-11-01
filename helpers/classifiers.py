@@ -3,7 +3,6 @@ Authors: Antoine Marion 2021, JBM major refactor 2021, 2022, 2023
 
 Fonctions de classification pour le labo
 S8 GIA APP2
-TODO modifier si nécessaire pour la problématique
 
 Fichier comporte 3 grandes catégories de classes
 A) Classificateurs de base: fonctions au prototype relativement similaire, prennent des données d'entraînement
@@ -177,7 +176,6 @@ class BayesClassifier:
             classProbDensities.append(self.densities[i].computeProbability(testdata1array))
         # reshape pour que les lignes soient les calculs pour 1 point original, i.e. même disposition que l'array d'entrée
         classProbDensities = np.array(classProbDensities).T
-        # TODO problematique: take apriori and cost into consideration! here for risk computation argmax assumes equal costs and apriori
         for i in range(len(classProbDensities)):
             densities = classProbDensities[i]
             if densities[0] <= 0.001 and densities[1] <= 0.001 and densities[2] <= 0.001:
@@ -225,7 +223,6 @@ class BayesClassify_APP2:
 class PPVClassifier:
     def __init__(self, data2train, n_neighbors=1, metric='minkowski',
                  useKmean=False, n_represantants=1, experiment_title='PPV Classifier', view=False):
-        # TODO L2.E3.1 Compléter la logique pour utiliser la librairie ici
         # le 1 est suspect et il manque des arguments
         self.n_classes, _, self.representationDimensions = np.asarray(data2train.dataLists).shape
         self.kNN = KNN(n_neighbors=n_neighbors)  # minkowski correspond à distance euclidienne lorsque le paramètre p = 2
@@ -298,7 +295,6 @@ class KMeanAlgo:
         self.cluster_centers = []
         self.cluster_labels = np.zeros((n_representants * self.n_classes, 1))
         for i in range(self.n_classes):  # itère sur l'ensemble des classes
-            # TODO L2.E3.3 compléter la logique pour utiliser la librairie ici
             # encore une fois le 1 est suspect
             self.kmeans_on_each_class.append(KM(n_representants, n_init='auto'))
             self.kmeans_on_each_class[i].fit(np.array(data2train.dataLists[i]))
@@ -378,7 +374,6 @@ class NNClassifier:
                 encodedLabels1array[range(i * len(labelsLists[i]), (i + 1) * len(labelsLists[i]))])
 
         # Preprocess Data
-        # TODO problématique: voir si d'autres transformations sont requises, ajuster predict en conséquence
         scaledData, self.minmax = an.scaleData(dataLists)
 
         # Split into train and validation subsets
@@ -560,7 +555,6 @@ class print_every_N_epochs(K.callbacks.Callback):
         self.epochs = N_epochs
 
     def on_epoch_end(self, epoch, logs=None):
-        # TODO L2.E2.4
         if (int(epoch)) == 0:
             print("Epoch: {:>3} | Loss: ".format(epoch) +
                   f"{logs['loss']:.4e}" + " | Valid loss: " + f"{logs['val_loss']:.4e}" +

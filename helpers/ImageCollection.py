@@ -8,7 +8,7 @@ Membres :
 Méthodes pour la problématique :
     generateRGBHistograms : calcul l'histogramme RGB de chaque image, à compléter
     generateRepresentation : vide, à compléter pour la problématique
-Méthodes génériques : TODO JB move to helpers
+Méthodes génériques :
     generateHistogram : histogramme une image à 3 canaux de couleurs arbitraires
     images_display: affiche quelques images identifiées en argument
     view_histogrammes: affiche les histogrammes de couleur de qq images identifiées en argument
@@ -161,12 +161,10 @@ class ImageCollection:
         """
         Calcule les histogrammes RGB de toutes les images
         """
-        # TODO L1.E4.6 S'inspirer de view_histogrammes et déménager le code pertinent ici
         raise NotImplementedError()
 
     def generateRepresentation(self):
         # produce a ClassificationData object usable by the classifiers
-        # TODO L1.E4.8: commencer l'analyse de la représentation choisie
         raise NotImplementedError()
 
     def images_display(self, indexes):
@@ -208,8 +206,8 @@ class ImageCollection:
                     self.image_folder + os.sep + self.image_list[indexes[image_counter]])
 
             # Exemple de conversion de format pour Lab et HSV
-            imageLab = skic.rgb2lab(imageRGB)  # TODO L1.E4.5: afficher ces nouveaux histogrammes
-            imageHSV = skic.rgb2hsv(imageRGB)  # TODO problématique: essayer d'autres espaces de couleur
+            imageLab = skic.rgb2lab(imageRGB)
+            imageHSV = skic.rgb2hsv(imageRGB)
             imageXYZ = skic.rgb2xyz(imageRGB)
             print("math variance: ", self.getRGBVariance(imageRGB))
             #print("max luminence: ", self.max_luminence(imageRGB))
@@ -245,7 +243,6 @@ class ImageCollection:
             ax[image_counter, 0].set_title(f'histogramme RGB de {image_name}')
 
             # 2e histogramme
-            # TODO L1.E4 afficher les autres histogrammes de Lab ou HSV dans la 2e colonne de subplots
             ax[image_counter, 1].scatter(range(start, end), histtvaluesLab[0, start:end], s=3, c='magenta')
             ax[image_counter, 1].scatter(range(start, end), histtvaluesLab[1, start:end], s=3, c='purple')
             ax[image_counter, 1].scatter(range(start, end), histtvaluesLab[2, start:end], s=3, c='cyan')
