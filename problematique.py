@@ -29,12 +29,12 @@ def problematique_APP2():
 
         nn = classifiers.NNClassify_APP2(data2train=data, data2test=data,
                                           n_layers=n_layers, n_neurons=n_neurons, innerActivation='tanh',
-                                          outputActivation='softmax', optimizer=Adam(), loss='categorical_crossentropy',
+                                          outputActivation='softmax', optimizer=Adam(learning_rate=0.0005), loss='categorical_crossentropy',
                                           metrics=['accuracy'],
                                           callback_list=[K.callbacks.EarlyStopping(patience=50, verbose=1, restore_best_weights=1),
                                                          classifiers.print_every_N_epochs(25)],
                                           experiment_title='NN Simple',
-                                          n_epochs = 1000, savename='classification',
+                                          n_epochs = 1500, savename='classification',
                                           ndonnees_random=5000, gen_output=True, view=True)
 
         ppv = classifiers.PPVClassify_APP2(data2train=data, data2test=data, n_neighbors=3, ndonnees_random=5000,
